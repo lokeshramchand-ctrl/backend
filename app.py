@@ -5,6 +5,16 @@ from routers.v1 import router as v1_router
 from database.mongo import db
 from database.milvus import vector_db
 from pymilvus import connections
+from routers.memory import router as memory_router  # <-- 1. Add this import
+
+import logging
+
+# Configure logging globally
+logging.basicConfig(
+    level=logging.DEBUG,  # DEBUG gives you the most detail
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+)
+logger = logging.getLogger(__name__)
 
 # Lifespan context manager for startup and shutdown events
 @asynccontextmanager
@@ -28,16 +38,17 @@ app = FastAPI(
 # Phase 11 Foresight: Initialize Prometheus Metrics Middleware
 Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 app.include_router(v1_router)
+app.include_router(memory_router)  # <-- 2. Register the memory router here
+
 @app.get("/health", tags=["System"])
 async def health_check():
-    """
-    Validates API operational status and database connectivity.
-    """
     mongo_status = "connected" if db.client else "disconnected"
     milvus_status = "connected" if vector_db.client else "disconnected"
 
+    logger.debug("Health check: MongoDB=%s, Milvus=%s", mongo_status, milvus_status)
+
     return {
-        "status": "healthy",
+        "status": "healthy" if mongo_status == "connected" and milvus_status == "connected" else "degraded",
         "services": {
             "mongodb": mongo_status,
             "milvus": milvus_status

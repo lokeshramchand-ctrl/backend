@@ -1,24 +1,16 @@
 version: "3.9"
 
 services:
-  velar-backend:
-    build: .
-    container_name: velar-backend
-    command: uvicorn app:app --host 0.0.0.0 --port 8000
-    working_dir: /app
-    volumes:
-      - .:/app
-    environment:
-      - MONGO_URI=mongodb://lokesh:Lokesh%401234@123156456323:27017/?authSource=admin
-      - MONGO_DB_NAME=velar
-      - MILVUS_HOST=10.10.10.130
-      - MILVUS_PORT=19530
-    ports:
-      - "9850:8000"
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
     restart: always
-    networks:
-      - coolify
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
 
-networks:
-  coolify:
-    external: true
+
+volumes:
+  mongo_data:
+
