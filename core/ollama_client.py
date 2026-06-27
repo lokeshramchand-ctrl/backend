@@ -4,9 +4,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 OLLAMA_HOSTS = [
-    "http://10.10.10.100:11434",
+    #"http://10.10.10.100:11434",
     "https://ollama.splsystems.in",
-    "http://localhost:11434"
+    #"http://localhost:11434"
 ]
 
 def resolve_ollama_host(hosts: list[str]) -> str:
@@ -24,7 +24,7 @@ def resolve_ollama_host(hosts: list[str]) -> str:
                 continue
                 
     logger.error("No Ollama hosts available. Pipeline will fail on embedding generation.")
-    return "http://localhost:11434"  # Final desperate fallback
+    return "https://ollama.splsystems.in"  # Final desperate fallback
 
 # Initialize constants
 OLLAMA_HOST = resolve_ollama_host(OLLAMA_HOSTS)
